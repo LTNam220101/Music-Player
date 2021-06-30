@@ -38,6 +38,7 @@ html {
     background-color: #fff;
     border-radius: 4px;
     position: fixed;
+    z-index: 10;
     top: 0;
     width: 100%;
     max-width: 480px;
@@ -173,7 +174,7 @@ header h2{
 }
 
 .song:hover {
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
     animation: onHover ease 0.05s forwards;
 }
 
