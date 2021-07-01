@@ -1,0 +1,34 @@
+{
+  "songs": [
+    {
+      "name": "Peaches",
+      "author": "Justin Bieber, Daniel Caesar, Giveon",
+      "audio": "./MP3/Peaches.mp3",
+      "img": "./IMG/peaches.jpg"
+  },
+  {
+      "name": "Kiss Me More",
+      "author": "Doja Cat, SZA",
+      "audio": "./MP3/KissMeMore.mp3",
+      "img": "./IMG/kissmemore.jpg"
+  },
+  {
+      "name": "Save Your Tears (Remix)",
+      "author": "The Weeknd, Ariana Grande",
+      "audio": "./MP3/SaveYourTears.mp3",
+      "img": "./IMG/saveyourtears.jpg"
+  },
+  {
+      "name": "Montero (Call Me By Your Name)",
+      "author": "Lil Nas X",
+      "audio": "./MP3/Montero.mp3",
+      "img": "./IMG/montero.jpg"
+  },
+  {
+      "name": "Deja Vu",
+      "author": "Olivia Rodrigo",
+      "audio": "./MP3/DejaVu.mp3",
+      "img": "./IMG/dejavu.jpg"
+  }
+  ]
+}

@@ -155,6 +155,9 @@ const app = {
         }
         // khi click btn Next
         btnNext.onclick = function(){
+            if(audio.loop){
+                
+            }
             if(_this.isRandom){
                 _this.randomSong()
             }else{
@@ -206,16 +209,20 @@ const app = {
 
     },
     prevSong: function(){
-        this.currentIndex == 0 ? this.currentIndex = 0 : this.currentIndex--
-        playlist.querySelector('.song.active').classList.remove('active')
-        playlist.querySelector(`div[index*="${this.currentIndex}"]`).classList.add('active')
+        if(!audio.loop){
+            this.currentIndex == 0 ? this.currentIndex = 0 : this.currentIndex--
+            playlist.querySelector('.song.active').classList.remove('active')
+            playlist.querySelector(`div[index*="${this.currentIndex}"]`).classList.add('active')
+        }
         this.loadCurrentSong()
 
     },
     nextSong: function(){
-        this.currentIndex == this.songs.length - 1 ? this.currentIndex = 0 : this.currentIndex++
-        playlist.querySelector('.song.active').classList.remove('active')
-        playlist.querySelector(`div[index*="${this.currentIndex}"]`).classList.add('active')
+        if(!audio.loop){
+            this.currentIndex == this.songs.length - 1 ? this.currentIndex = 0 : this.currentIndex++
+            playlist.querySelector('.song.active').classList.remove('active')
+            playlist.querySelector(`div[index*="${this.currentIndex}"]`).classList.add('active')
+        }
         this.loadCurrentSong()
     },
     randomSong: function(){
