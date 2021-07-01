@@ -58,7 +58,7 @@ const app = {
     render: function(){
         htmls = this.songs.map((song, index) => {
             return `
-            <div class="song ${index === this.currentIndex ? 'active' : ''}" data-index="${index}">
+            <div class="song ${index === this.currentIndex ? 'active' : ''}" index="${index}">
             <div class="thumb" style="background-image: url(${song.img})">
             </div>
             <div class="body">
@@ -152,7 +152,6 @@ const app = {
             }
             audio.play()
             cdThumbAnimation.play()
-            _this.render()
         }
         // khi click btn Next
         btnNext.onclick = function(){
@@ -163,7 +162,6 @@ const app = {
             }
             audio.play()
             cdThumbAnimation.play()
-            _this.render()
         }
         // khi click btn random => xử lý bật tắt random mode
         btnRandom.onclick = function(){
@@ -194,7 +192,7 @@ const app = {
                 if(song !== songPlaying){
                     song.classList.add('active')
                     songPlaying.classList.remove('active')
-                    _this.currentIndex = song.dataset.index
+                    _this.currentIndex = song.getAttribute('index')
                     _this.loadCurrentSong()
                     audio.play()
                 }
@@ -209,12 +207,15 @@ const app = {
     },
     prevSong: function(){
         this.currentIndex == 0 ? this.currentIndex = 0 : this.currentIndex--
+        playlist.querySelector('.song.active').classList.remove('active')
+        playlist.querySelector(`div[index*="${this.currentIndex}"]`).classList.add('active')
         this.loadCurrentSong()
 
     },
     nextSong: function(){
         this.currentIndex == this.songs.length - 1 ? this.currentIndex = 0 : this.currentIndex++
-        // document.querySelector('.song.active').classList.remove('.active')
+        playlist.querySelector('.song.active').classList.remove('active')
+        playlist.querySelector(`div[index*="${this.currentIndex}"]`).classList.add('active')
         this.loadCurrentSong()
     },
     randomSong: function(){
@@ -223,6 +224,8 @@ const app = {
             randomIndex = Math.floor(Math.random() * this.songs.length)
         }while (randomIndex == this.currentIndex) 
         this.currentIndex = randomIndex
+        playlist.querySelector('.song.active').classList.remove('active')
+        playlist.querySelector(`div[index*="${this.currentIndex}"]`).classList.add('active')
         this.loadCurrentSong()
     },
     start: function(){
