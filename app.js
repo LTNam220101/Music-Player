@@ -1,6 +1,8 @@
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
+const PLAYER_STORAGE_KEY = "MUSIC_PLAYER"
+
 const player = $('.player')
 const dashboard = $('.dashboard')
 const heading = $('header h2')
@@ -8,17 +10,19 @@ const cd = $('.cd')
 const cdWidth = cd.offsetWidth
 const cdThumb = $('.cd-thumb')
 const control = $('.control')
-const btnRepeat = $('.btn-repeat')
+const btnLoop = $('.btn-repeat')
 const btnPrev = $('.btn-prev')
 const btnPlay = $('.btn-play')
 const btnNext = $('.btn-next')
 const btnRandom = $('.btn-random')
+const volume = $('.btn-volume')
+const volumeProgress = $('.volume-progress')
 const timeCurrent = $('.time-current')
 const timeDuration = $('.time-duration')
 const progress = $('#progress')
 const audio = $('#audio')
 const playlist = $(".playlist");
-
+ 
 const app = {
     songs: [
         {
@@ -55,10 +59,18 @@ const app = {
     currentIndex: 0,
     isPlaying: false,
     isRandom: false,
+    isLoop: false,
+    isMute: false,
+    volume: 1,
+    config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
+    setConfig: function(key, value){
+        this.config[key] = value
+        localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config))
+    },
     render: function(){
         htmls = this.songs.map((song, index) => {
             return `
-            <div class="song ${index === this.currentIndex ? 'active' : ''}" index="${index}">
+            <div class="song ${index === Number(this.currentIndex) ? 'active' : ''}" index="${index}">
             <div class="thumb" style="background-image: url(${song.img})">
             </div>
             <div class="body">
@@ -71,6 +83,11 @@ const app = {
             </div>
             <div class="options">
                 <i class="fas fa-ellipsis-h"></i>
+                <div class="options__nav">
+                    <div class="detele">
+                        Xóa
+                    </div>
+                </div>
             </div>
         </div>
         `
@@ -132,56 +149,92 @@ const app = {
             progress.max = audio.duration
             progress.value = audio.currentTime
         }
-        // khi clink progress, chuyển đến đoạn click
-        progress.onchange = function(){
-            audio.currentTime = progress.value
-        }
         // khi clink btn Repeat
-        btnRepeat.onclick = function(){
-            _this.isRandom = false
-            btnRandom.classList.toggle('active', _this.isRandom)
-            audio.loop = !audio.loop
-            btnRepeat.classList.toggle('active', audio.loop)
+        btnLoop.onclick = function(){
+            if(_this.isLoop){
+                _this.isLoop = false
+                audio.loop = false
+                btnLoop.classList.remove('active')
+            }else{
+                _this.isRandom = false
+                _this.isLoop = true
+                audio.loop = true
+                btnRandom.classList.remove('active')
+                btnLoop.classList.add('active')
+            }
+            _this.setConfig('isLoop', _this.isLoop)
+            _this.setConfig('isRandom', _this.isRandom)
         }
         // khi click btn Prev
         btnPrev.onclick = function(){
             if(_this.isRandom){
                 _this.randomSong()
+            }else if (_this.isLoop){
+                _this.loadCurrentSong()
             }else{
                 _this.prevSong()
             }
             audio.play()
             cdThumbAnimation.play()
+            _this.setConfig('currentIndex', _this.currentIndex)
         }
         // khi click btn Next
         btnNext.onclick = function(){
-            if(audio.loop){
-                
-            }
             if(_this.isRandom){
                 _this.randomSong()
+            }else if (_this.isLoop){
+                _this.loadCurrentSong()
             }else{
                 _this.nextSong()
             }
             audio.play()
             cdThumbAnimation.play()
+            _this.setConfig('currentIndex', _this.currentIndex)
         }
         // khi click btn random => xử lý bật tắt random mode
         btnRandom.onclick = function(){
             if(_this.isRandom){
                 _this.isRandom = false
+                btnRandom.classList.remove('active')
             }else{
                 _this.isRandom = true
+                _this.isLoop = false
                 audio.loop = false
-                btnRepeat.classList.toggle('active', audio.loop)
+                btnLoop.classList.remove('active')
+                btnRandom.classList.add('active')
             }
-            btnRandom.classList.toggle('active', _this.isRandom)
+            _this.setConfig('isRandom', _this.isRandom)
+            _this.setConfig('isLoop', _this.isLoop)
+            _this.setConfig('currentIndex', _this.currentIndex)
+        }
+        // khi chọn volume icon
+        volume.onclick = function(){
+            _this.isMute = !_this.isMute
+            volume.classList.toggle('mute', _this.isMute)
+            _this.isMute ? audio.volume = 0 : audio.volume = _this.volume
+            _this.setConfig('volume', _this.isMute ? 0 : _this.volume)
+            _this.setConfig('isMute', isMute)
+        }
+        // khi chọn thanh volume
+        volumeProgress.onchange = function(){
+            _this.volume = volumeProgress.value / 100
+            audio.volume = _this.volume
+            _this.isMute = false
+            _this.setConfig('volume', _this.volume)
+            _this.setConfig('isMute', _this.isMute)
+        }
+        // khi clink progress, chuyển đến đoạn click
+        progress.onchange = function(){
+            audio.currentTime = progress.value
         }
         // xử lý khi audio ended
         audio.onended = function(){
             if(_this.isRandom){
                 _this.randomSong()
-            }else{
+            }else if(_this.isLoop){
+
+            }
+            else{
                 _this.nextSong()
             }
             audio.play()
@@ -199,14 +252,31 @@ const app = {
                     _this.loadCurrentSong()
                     audio.play()
                 }
+            }else{
+                optionsNav = playlist.querySelector()
+                // console.log(e.target)
+                console.log(optionsNav)
             }
+             
+            _this.setConfig('currentIndex', _this.currentIndex)
         }
     },
     loadCurrentSong: function(){
         heading.textContent = this.currentSong.name
         cdThumb.style.backgroundImage = `url(${this.currentSong.img})`
         audio.src = this.currentSong.audio
-
+    },
+    loadConfig: function(){
+        this.isRandom = this.config.isRandom
+        this.isLoop = this.config.isLoop
+        this.currentIndex = this.config.currentIndex ? this.config.currentIndex : 0 
+        
+        this.volume = this.config.volume ? this.config.volume : 1
+        audio.volume = this.volume
+        volumeProgress.value = audio.volume * 100
+        // console.log(volumeProgress.value)
+        btnRandom.classList.toggle('active', this.isRandom ? true: false)
+        btnLoop.classList.toggle('active', this.isLoop ? true: false)
     },
     prevSong: function(){
         if(!audio.loop){
@@ -215,7 +285,6 @@ const app = {
             playlist.querySelector(`div[index*="${this.currentIndex}"]`).classList.add('active')
         }
         this.loadCurrentSong()
-
     },
     nextSong: function(){
         if(!audio.loop){
@@ -236,12 +305,14 @@ const app = {
         this.loadCurrentSong()
     },
     start: function(){
+        // Load các settings
+        this.loadConfig()
         // Định nghĩa các thuộc tính cho object
         this.definedProperties()
-        // lắng nghe, xử lí các sự kiện 
-        this.handleEvents();
         // Load playList
         this.render();
+        // lắng nghe, xử lí các sự kiện 
+        this.handleEvents();
         // Load bài hát đầu tiên vào UI
         this.loadCurrentSong()
     },
