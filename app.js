@@ -18,7 +18,7 @@ const timeDuration = $('.time-duration')
 const progress = $('#progress')
 const audio = $('#audio')
 const playlist = $(".playlist");
-
+ 
 const app = {
     songs: [
         {
@@ -71,6 +71,11 @@ const app = {
             </div>
             <div class="options">
                 <i class="fas fa-ellipsis-h"></i>
+                <div class="options__nav">
+                    <div class="detele">
+                        Xóa
+                    </div>
+                </div>
             </div>
         </div>
         `
@@ -199,6 +204,10 @@ const app = {
                     _this.loadCurrentSong()
                     audio.play()
                 }
+            }else{
+                optionsNav = playlist.querySelector()
+                // console.log(e.target)
+                console.log(optionsNav)
             }
         }
     },
